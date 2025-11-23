@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>安卓直装游戏 - Galgame Core</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <style>
+        .game-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <div id="app" class="max-w-7xl mx-auto">
+        <!-- 顶部导航 -->
+        <header class="bg-white shadow-sm sticky top-0 z-50">
+            <nav class="container mx-auto px-4 py-3 flex items-center justify-between">
+                <a href="index.html" class="text-xl font-bold text-gray-800 flex items-center">
+                    <i class="fa fa-gamepad mr-2 text-pink-500"></i>
+                    <span>Galgame Core</span>
+                </a>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="index.html" class="text-gray-700 hover:text-pink-500 transition">首页</a>
+                    <a href="krkr.html" class="text-gray-700 hover:text-pink-500 transition">KRKR</a>
+                    <a href="android.html" class="text-pink-500 font-medium">安卓直装</a>
+                    <a href="tags.html" class="text-gray-700 hover:text-pink-500 transition">喜好标签</a>
+                    <a href="feedback.html" class="text-gray-700 hover:text-pink-500 transition">反馈</a>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="login.html" class="text-gray-700 hover:text-pink-500 transition text-sm">登录</a>
+                    <a href="register.html" class="bg-pink-500 text-white px-3 py-1 rounded-md text-sm hover:bg-pink-600 transition">注册</a>
+                    <button class="md:hidden text-gray-700" @click="isMenuOpen = !isMenuOpen">
+                        <i class="fa fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </nav>
+            <div v-if="isMenuOpen" class="md:hidden bg-white shadow-md px-4 py-2 space-y-3">
+                <a href="index.html" class="block text-gray-700 hover:text-pink-500 transition">首页</a>
+                <a href="krkr.html" class="block text-gray-700 hover:text-pink-500 transition">KRKR</a>
+                <a href="android.html" class="block text-pink-500 font-medium">安卓直装</a>
+                <a href="tags.html" class="block text-gray-700 hover:text-pink-500 transition">喜好标签</a>
+                <a href="feedback.html" class="block text-gray-700 hover:text-pink-500 transition">反馈</a>
+            </div>
+        </header>
+
+        <!-- 分类筛选与搜索 -->
+        <section class="container mx-auto px-4 py-6">
+            <div class="bg-white rounded-xl shadow-sm p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div class="flex items-center space-x-4">
+                    <span class="text-gray-700">分类：</span>
+                    <button class="px-3 py-1 rounded-md text-sm" :class="currentType === 'all' ? 'bg-pink-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+                            @click="currentType = 'all'">全部</button>
+                    <button class="px-3 py-1 rounded-md text-sm" :class="currentType === 'adult' ? 'bg-pink-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+                            @click="currentType = 'adult'">成人向</button>
+                    <button class="px-3 py-1 rounded-md text-sm" :class="currentType === 'allAge' ? 'bg-pink-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+                            @click="currentType = 'allAge'">全年龄</button>
+                </div>
+                <div class="flex items-center w-full md:w-auto">
+                    <input type="text" v-model="searchKey" placeholder="搜索安卓直装游戏..."
+                           class="flex-1 px-4 py-2 border border-gray-200 rounded-l-lg focus:outline-none focus:border-pink-500">
+                    <button class="bg-pink-500 text-white px-4 py-2 rounded-r-lg hover:bg-pink-600 transition">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 游戏列表 -->
+        <section class="container mx-auto px-4 py-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <div v-for="game in filteredGames" :key="game.id" class="game-card bg-white rounded-xl shadow-sm overflow-hidden">
+                    <a :href="`game-detail.html?id=${game.id}`">
+                        <div class="h-48 overflow-hidden">
+                            <img :src="game.imgUrl" alt="游戏封面" class="w-full h-full object-cover">
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-bold text-gray-800 mb-1">{{ game.title }}</h3>
+                            <div class="flex items-center text-sm text-gray-500 mb-2">
+                                <span class="mr-3"><i class="fa fa-android mr-1"></i> 安卓直装</span>
+                                <span :class="game.type === 'adult' ? 'text-pink-500' : 'text-blue-500'">
+                                    {{ game.type === 'adult' ? '成人向' : '全年龄' }}
+                                </span>
+                            </div>
+                            <p class="text-sm text-gray-600 line-clamp-2">{{ game.desc }}</p>
+                        </div>
+                    </a>
+                    <div class="px-4 pb-4 flex justify-between">
+                        <a :href="game.downloadUrl" class="text-pink-500 hover:text-pink-600 text-sm flex items-center">
+                            <i class="fa fa-download mr-1"></i> 下载
+                        </a>
+                        <span class="text-gray-400 text-sm">{{ game.updateTime }}</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 页脚 -->
+        <footer class="bg-white mt-8 py-6 border-t border-gray-200">
+            <div class="container mx-auto px-4 text-center text-gray-500 text-sm">
+                <p>© 2025 Galgame Core 核心玩家平台 | 仅供交流学习，请勿用于商业用途</p>
+                <p class="mt-2">如有侵权请联系删除 | 反馈邮箱：feedback@galgamecore.com</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    isMenuOpen: false,
+                    currentType: 'all',
+                    searchKey: "",
+                    games: [
+                        {
+                            id: 5,
+                            title: "路人女主的养成方法",
+                            imgUrl: "https://picsum.photos/id/248/400/300",
+                            type: "allAge",
+                            desc: "讲述了普通高中生安艺伦也与三位性格各异的女孩共同制作游戏的故事。",
+                            downloadUrl: "#",
+                            updateTime: "2025-09-25"
+                        },
+                        {
+                            id: 6,
+                            title: "美少女万华镜",
+                            imgUrl: "https://picsum.photos/id/249/400/300",
+                            type: "adult",
+                            desc: "系列奇幻题材Galgame，每部都有独立的剧情和精美的画风。",
+                            downloadUrl: "#",
+                            updateTime: "2025-10-03"
+                        },
+                        {
+                            id: 7,
+                            title: "Love Plus",
+                            imgUrl: "https://picsum.photos/id/250/400/300",
+                            type: "allAge",
+                            desc: "经典恋爱模拟Galgame，玩家可以与虚拟女友进行各种互动。",
+                            downloadUrl: "#",
+                            updateTime: "2025-09-18"
+                        },
+                        {
+                            id: 8,
+                            title: "Nekopara",
+                            imgUrl: "https://picsum.photos/id/251/400/300",
+                            type: "adult",
+                            desc: "以猫娘为主题的纯爱Galgame，剧情轻松治愈，画风可爱。",
+                            downloadUrl: "#",
+                            updateTime: "2025-10-06"
+                        }
+                    ]
+                };
+            },
+            computed: {
+                filteredGames() {
+                    return this.games.filter(game => {
+                        const typeMatch = this.currentType === 'all' || game.type === this.currentType;
+                        const searchMatch = game.title.toLowerCase().includes(this.searchKey.toLowerCase());
+                        return typeMatch && searchMatch;
+                    });
+                }
+            }
+        });
+        app.mount('#app');
+    </script>
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galgame核心平台 - 首页</title>
+    <!-- 引入Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入Vue3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- 引入图标库（简约动漫风） -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <style>
+        /* 自定义动画：轮播图过渡 */
+        .carousel-item {
+            transition: opacity 0.5s ease-in-out;
+        }
+        .tag-item {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .tag-item:hover {
+            background-color: #f0f0f0;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <div id="app" class="max-w-7xl mx-auto">
+        <!-- 顶部导航 -->
+        <header class="bg-white shadow-sm sticky top-0 z-50">
+            <nav class="container mx-auto px-4 py-3 flex items-center justify-between">
+                <!-- 网站Logo -->
+                <a href="#" class="text-xl font-bold text-gray-800 flex items-center">
+                    <i class="fa fa-gamepad mr-2 text-pink-500"></i>
+                    <span>Galgame Core</span>
+                </a>
+                <!-- 导航菜单 -->
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="#" class="text-gray-700 hover:text-pink-500 transition">首页</a>
+                    <a href="krkr.html" class="text-gray-700 hover:text-pink-500 transition">KRKR</a>
+                    <a href="android.html" class="text-gray-700 hover:text-pink-500 transition">安卓直装</a>
+                    <div class="relative group">
+                        <a href="tags.html" class="text-gray-700 hover:text-pink-500 transition flex items-center">
+                            喜好标签
+                            <i class="fa fa-angle-down ml-1 text-xs"></i>
+                        </a>
+                    </div>
+                    <a href="feedback.html" class="text-gray-700 hover:text-pink-500 transition">反馈</a>
+                </div>
+                <!-- 登录/注册 -->
+                <div class="flex items-center space-x-3">
+                    <a href="login.html" class="text-gray-700 hover:text-pink-500 transition text-sm">登录</a>
+                    <a href="register.html" class="bg-pink-500 text-white px-3 py-1 rounded-md text-sm hover:bg-pink-600 transition">注册</a>
+                    <!-- 移动端菜单按钮 -->
+                    <button class="md:hidden text-gray-700" @click="isMenuOpen = !isMenuOpen">
+                        <i class="fa fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </nav>
+            <!-- 移动端导航菜单 -->
+            <div v-if="isMenuOpen" class="md:hidden bg-white shadow-md px-4 py-2 space-y-3">
+                <a href="#" class="block text-gray-700 hover:text-pink-500 transition">首页</a>
+                <a href="krkr.html" class="block text-gray-700 hover:text-pink-500 transition">KRKR</a>
+                <a href="android.html" class="block text-gray-700 hover:text-pink-500 transition">安卓直装</a>
+                <a href="tags.html" class="block text-gray-700 hover:text-pink-500 transition">喜好标签</a>
+                <a href="feedback.html" class="block text-gray-700 hover:text-pink-500 transition">反馈</a>
+            </div>
+        </header>
+
+        <!-- 焦点轮播图 -->
+        <section class="container mx-auto px-4 py-6">
+            <div class="relative rounded-xl overflow-hidden h-[300px] md:h-[450px]">
+                <div v-for="(item, index) in carouselList" :key="index" 
+                     class="carousel-item absolute top-0 left-0 w-full h-full opacity-0"
+                     :class="{ 'opacity-100': currentIndex === index }">
+                    <img :src="item.imgUrl" alt="热门作品" class="w-full h-full object-cover">
+                    <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/70 to-transparent text-white p-4">
+                        <h3 class="text-xl md:text-2xl font-bold">{{ item.title }}</h3>
+                        <p class="text-sm md:text-base mt-1">{{ item.desc }}</p>
+                    </div>
+                </div>
+                <!-- 轮播控制按钮 -->
+                <button class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-black/70 transition"
+                        @click="prevCarousel">
+                    <i class="fa fa-angle-left"></i>
+                </button>
+                <button class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-black/70 transition"
+                        @click="nextCarousel">
+                    <i class="fa fa-angle-right"></i>
+                </button>
+                <!-- 轮播指示器 -->
+                <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex space-x-2">
+                    <span v-for="(item, index) in carouselList" :key="index" 
+                          class="w-2 h-2 rounded-full bg-white/50 hover:bg-white transition"
+                          :class="{ 'bg-white': currentIndex === index }"
+                          @click="currentIndex = index"></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 快速搜索框 -->
+        <section class="container mx-auto px-4 py-4">
+            <div class="bg-white rounded-xl shadow-sm p-4">
+                <div class="flex items-center">
+                    <input type="text" v-model="searchKey" 
+                           placeholder="输入游戏名搜索..." 
+                           class="flex-1 px-4 py-2 border border-gray-200 rounded-l-lg focus:outline-none focus:border-pink-500">
+                    <button class="bg-pink-500 text-white px-6 py-2 rounded-r-lg hover:bg-pink-600 transition">
+                        <i class="fa fa-search mr-1"></i> 搜索
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 热门标签推荐（首页辅助） -->
+        <section class="container mx-auto px-4 py-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">热门标签</h2>
+            <div class="flex flex-wrap gap-2">
+                <div class="tag-item bg-white px-3 py-1 rounded-full text-gray-700 border border-gray-200"
+                     @click="goToTagPage('纯爱')">纯爱</div>
+                <div class="tag-item bg-white px-3 py-1 rounded-full text-gray-700 border border-gray-200"
+                     @click="goToTagPage('悬疑')">悬疑</div>
+                <div class="tag-item bg-white px-3 py-1 rounded-full text-gray-700 border border-gray-200"
+                     @click="goToTagPage('校园')">校园</div>
+                <div class="tag-item bg-white px-3 py-1 rounded-full text-gray-700 border border-gray-200"
+                     @click="goToTagPage('奇幻')">奇幻</div>
+                <div class="tag-item bg-white px-3 py-1 rounded-full text-gray-700 border border-gray-200"
+                     @click="goToTagPage('治愈')">治愈</div>
+            </div>
+        </section>
+
+        <!-- 页脚 -->
+        <footer class="bg-white mt-8 py-6 border-t border-gray-200">
+            <div class="container mx-auto px-4 text-center text-gray-500 text-sm">
+                <p>© 2025 Galgame Core 核心玩家平台 | 仅供交流学习，请勿用于商业用途</p>
+                <p class="mt-2">如有侵权请联系删除 | 反馈邮箱：feedback@galgamecore.com</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    isMenuOpen: false, // 移动端菜单状态
+                    carouselList: [ // 轮播图数据（实际项目从后端获取）
+                        {
+                            imgUrl: "https://picsum.photos/id/237/1200/450",
+                            title: "樱花庄的宠物女孩",
+                            desc: "经典纯爱Galgame，讲述天才与普通人的青春故事"
+                        },
+                        {
+                            imgUrl: "https://picsum.photos/id/238/1200/450",
+                            title: "Clannad After Story",
+                            desc: "治愈系神作，描绘家庭与成长的温暖篇章"
+                        },
+                        {
+                            imgUrl: "https://picsum.photos/id/239/1200/450",
+                            title: "命运石之门",
+                            desc: "悬疑科幻经典，跨越时空的救赎之旅"
+                        }
+                    ],
+                    currentIndex: 0, // 轮播图当前索引
+                    searchKey: "" // 搜索关键词
+                };
+            },
+            mounted() {
+                // 轮播图自动播放
+                this.carouselTimer = setInterval(() => {
+                    this.nextCarousel();
+                }, 3000);
+            },
+            beforeUnmount() {
+                // 清除定时器
+                clearInterval(this.carouselTimer);
+            },
+            methods: {
+                prevCarousel() {
+                    this.currentIndex = (this.currentIndex - 1 + this.carouselList.length) % this.carouselList.length;
+                },
+                nextCarousel() {
+                    this.currentIndex = (this.currentIndex + 1) % this.carouselList.length;
+                },
+                goToTagPage(tag) {
+                    // 跳转到标签页面，携带标签参数
+                    window.location.href = `tags.html?tag=${encodeURIComponent(tag)}`;
+                }
+            }
+        });
+        app.mount('#app');
+    </script>
+</body>
+</html>

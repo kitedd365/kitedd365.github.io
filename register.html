@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册 - Galgame Core</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <style>
+        .form-input:focus {
+            outline: none;
+            border-color: #ec4899;
+            box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <div id="app" class="max-w-7xl mx-auto">
+        <!-- 顶部导航 -->
+        <header class="bg-white shadow-sm sticky top-0 z-50">
+            <nav class="container mx-auto px-4 py-3 flex items-center justify-between">
+                <a href="index.html" class="text-xl font-bold text-gray-800 flex items-center">
+                    <i class="fa fa-gamepad mr-2 text-pink-500"></i>
+                    <span>Galgame Core</span>
+                </a>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="index.html" class="text-gray-700 hover:text-pink-500 transition">首页</a>
+                    <a href="krkr.html" class="text-gray-700 hover:text-pink-500 transition">KRKR</a>
+                    <a href="android.html" class="text-gray-700 hover:text-pink-500 transition">安卓直装</a>
+                    <a href="tags.html" class="text-gray-700 hover:text-pink-500 transition">喜好标签</a>
+                    <a href="feedback.html" class="text-gray-700 hover:text-pink-500 transition">反馈</a>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="login.html" class="text-gray-700 hover:text-pink-500 transition text-sm">登录</a>
+                    <a href="register.html" class="bg-pink-500 text-white px-3 py-1 rounded-md text-sm hover:bg-pink-600 transition">注册</a>
+                    <button class="md:hidden text-gray-700" @click="isMenuOpen = !isMenuOpen">
+                        <i class="fa fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </nav>
+            <div v-if="isMenuOpen" class="md:hidden bg-white shadow-md px-4 py-2 space-y-3">
+                <a href="index.html" class="block text-gray-700 hover:text-pink-500 transition">首页</a>
+                <a href="krkr.html" class="block text-gray-700 hover:text-pink-500 transition">KRKR</a>
+                <a href="android.html" class="block text-gray-700 hover:text-pink-500 transition">安卓直装</a>
+                <a href="tags.html" class="block text-gray-700 hover:text-pink-500 transition">喜好标签</a>
+                <a href="feedback.html" class="block text-gray-700 hover:text-pink-500 transition">反馈</a>
+            </div>
+        </header>
+
+        <!-- 注册表单 -->
+        <section class="container mx-auto px-4 py-8">
+            <div class="max-w-md mx-auto bg-white rounded-xl shadow-sm p-6 md:p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">用户注册</h2>
+                
+                <form @submit.prevent="register">
+                    <div class="mb-6">
+                        <label for="username" class="block text-gray-700 mb-2 text-sm">用户名 <span class="text-red-500">*</span></label>
+                        <input type="text" id="username" v-model="username" 
+                               class="w-full px-4 py-3 border border-gray-200 rounded-lg form-input"
+                               placeholder="请输入用户名（3-16位字符）">
+                        <p v-if="usernameError" class="text-red-500 text-xs mt-1">{{ usernameError }}</p>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label for="password" class="block text-gray-700 mb-2 text-sm">密码 <span class="text-red-500">*</span></label>
+                        <input type="password" id="password" v-model="password" 
+                               class="w-full px-4 py-3 border border-gray-200 rounded-lg form-input"
+                               placeholder="请输入密码（6-16位字符）">
+                        <p v-if="passwordError" class="text-red-500 text-xs mt-1">{{ passwordError }}</p>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label for="confirmPwd" class="block text-gray-700 mb-2 text-sm">确认密码 <span class="text-red-500">*</span></label>
+                        <input type="password" id="confirmPwd" v-model="confirmPwd" 
+                               class="w-full px-4 py-3 border border-gray-200 rounded-lg form-input"
+                               placeholder="请再次输入密码">
+                        <p v-if="confirmPwdError" class="text-red-500 text-xs mt-1">{{ confirmPwdError }}</p>
+                    </div>
+                    
+                    <div class="flex items-center mb-6">
+                        <input type="checkbox" id="agreement" v-model="agreeAgreement" class="mr-2 text-pink-500">
+                        <label for="agreement" class="text-gray-600 text-sm">我已阅读并同意<a href="#" class="text-pink-500 hover:underline">用户协议</a>和<a href="#" class="text-pink-500 hover:underline">隐私政策</a></label>
+                        <p v-if="!agreeAgreement && submitFailed" class="text-red-500 text-xs mt-1 ml-2">请同意用户协议</p>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-pink-500 text-white py-3 rounded-lg hover:bg-pink-600 transition flex items-center justify-center">
+                        <i class="fa fa-user-plus mr-2"></i> 注册
+                    </button>
+                    
+                    <div class="text-center mt-6 text-gray-600 text-sm">
+                        已有账号？<a href="login.html" class="text-pink-500 hover:underline">立即登录</a>
+                    </div>
+                </form>
+                
+                <!-- 注册成功提示 -->
+                <div v-if="registerSuccess" class="mt-6 bg-green-50 text-green-700 p-4 rounded-lg text-center">
+                    <i class="fa fa-check-circle mr-1"></i> 注册成功！即将跳转到登录页面...
+                </div>
+            </div>
+        </section>
+
+        <!-- 页脚 -->
+        <footer class="bg-white mt-8 py-6 border-t border-gray-200">
+            <div class="container mx-auto px-4 text-center text-gray-500 text-sm">
+                <p>© 2025 Galgame Core 核心玩家平台 | 仅供交流学习，请勿用于商业用途</p>
+                <p class="mt-2">如有侵权请联系删除 | 反馈邮箱：feedback@galgamecore.com</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    isMenuOpen: false,
+                    username: "",
+                    password: "",
+                    confirmPwd: "",
+                    agreeAgreement: false,
+                    usernameError: "",
+                    passwordError: "",
+                    confirmPwdError: "",
+                    submitFailed: false,
+                    registerSuccess: false
+                };
+            },
+            methods: {
+                register() {
+                    // 重置错误提示
+                    this.usernameError = "";
+                    this.passwordError = "";
+                    this.confirmPwdError = "";
+                    this.submitFailed = false;
+                    
+                    // 验证表单
+                    let isValid = true;
+                    
+                    if (!this.username.trim()) {
+                        this.usernameError = "用户名不能为空";
+                        isValid = false;
+                    } else if (this.username.length < 3 || this.username.length > 16) {
+                        this.usernameError = "用户名长度需在3-16位之间";
+                        isValid = false;
+                    }
+                    
+                    if (!this.password.trim()) {
+                        this.passwordError = "密码不能为空";
+                        isValid = false;
+                    } else if (this.password.length < 6 || this.password.length > 16) {
+                        this.passwordError = "密码长度需在6-16位之间";
+                        isValid = false;
+                    }
+                    
+                    if (this.password !== this.confirmPwd) {
+                        this.confirmPwdError = "两次输入的密码不一致";
+                        isValid = false;
+                    }
+                    
+                    if (!this.agreeAgreement) {
+                        this.submitFailed = true;
+                        isValid = false;
+                    }
+                    
+                    if (!isValid) return;
+                    
+                    // 模拟注册成功
+                    setTimeout(() => {
+                        this.registerSuccess = true;
+                        // 2秒后跳转到登录页面
+                        setTimeout(() => {
+                            window.location.href = "login.html";
+                        }, 2000);
+                    }, 1000);
+                }
+            }
+        });
+        app.mount('#app');
+    </script>
+</body>
+</html>

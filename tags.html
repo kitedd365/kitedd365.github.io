@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>喜好标签 - Galgame Core</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <style>
+        .tag-card {
+            transition: all 0.3s ease;
+        }
+        .tag-card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .game-item {
+            transition: transform 0.2s ease;
+        }
+        .game-item:hover {
+            transform: translateX(5px);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <div id="app" class="max-w-7xl mx-auto">
+        <!-- 顶部导航 -->
+        <header class="bg-white shadow-sm sticky top-0 z-50">
+            <nav class="container mx-auto px-4 py-3 flex items-center justify-between">
+                <a href="index.html" class="text-xl font-bold text-gray-800 flex items-center">
+                    <i class="fa fa-gamepad mr-2 text-pink-500"></i>
+                    <span>Galgame Core</span>
+                </a>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="index.html" class="text-gray-700 hover:text-pink-500 transition">首页</a>
+                    <a href="krkr.html" class="text-gray-700 hover:text-pink-500 transition">KRKR</a>
+                    <a href="android.html" class="text-gray-700 hover:text-pink-500 transition">安卓直装</a>
+                    <a href="tags.html" class="text-pink-500 font-medium">喜好标签</a>
+                    <a href="feedback.html" class="text-gray-700 hover:text-pink-500 transition">反馈</a>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="login.html" class="text-gray-700 hover:text-pink-500 transition text-sm">登录</a>
+                    <a href="register.html" class="bg-pink-500 text-white px-3 py-1 rounded-md text-sm hover:bg-pink-600 transition">注册</a>
+                    <button class="md:hidden text-gray-700" @click="isMenuOpen = !isMenuOpen">
+                        <i class="fa fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </nav>
+            <div v-if="isMenuOpen" class="md:hidden bg-white shadow-md px-4 py-2 space-y-3">
+                <a href="index.html" class="block text-gray-700 hover:text-pink-500 transition">首页</a>
+                <a href="krkr.html" class="block text-gray-700 hover:text-pink-500 transition">KRKR</a>
+                <a href="android.html" class="block text-gray-700 hover:text-pink-500 transition">安卓直装</a>
+                <a href="tags.html" class="block text-pink-500 font-medium">喜好标签</a>
+                <a href="feedback.html" class="block text-gray-700 hover:text-pink-500 transition">反馈</a>
+            </div>
+        </header>
+
+        <!-- 标签列表与对应游戏 -->
+        <section class="container mx-auto px-4 py-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">全部喜好标签</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- 标签卡片 -->
+                <div v-for="(tag, index) in tags" :key="index" class="tag-card bg-white rounded-xl shadow-sm p-5">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-gray-800 flex items-center">
+                            <i class="fa fa-tag text-pink-500 mr-2"></i>
+                            {{ tag.name }}
+                        </h3>
+                        <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm">{{ tag.games.length }} 款游戏</span>
+                    </div>
+                    
+                    <!-- 标签对应的游戏列表 -->
+                    <div class="space-y-3 max-h-40 overflow-y-auto pr-2">
+                        <div v-for="(game, gIndex) in tag.games" :key="gIndex" class="game-item flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg">
+                            <img :src="game.imgUrl" alt="游戏封面" class="w-12 h-12 rounded object-cover">
+                            <div class="flex-1">
+                                <a :href="`game-detail.html?id=${game.id}`" class="font-medium text-gray-800 hover:text-pink-500 transition line-clamp-1">{{ game.title }}</a>
+                                <div class="flex items-center text-xs text-gray-500 mt-1">
+                                    <span :class="game.type === 'adult' ? 'text-pink-500' : 'text-blue-500'">
+                                        {{ game.type === 'adult' ? '成人向' : '全年龄' }}
+                                    </span>
+                                    <span class="mx-2">|</span>
+                                    <span>{{ game.platform }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 查看更多按钮 -->
+                    <button class="w-full mt-4 bg-gray-100 text-gray-700 py-2 rounded-lg hover:bg-gray-200 transition text-sm">
+                        查看全部游戏 <i class="fa fa-angle-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 页脚 -->
+        <footer class="bg-white mt-8 py-6 border-t border-gray-200">
+            <div class="container mx-auto px-4 text-center text-gray-500 text-sm">
+                <p>© 2025 Galgame Core 核心玩家平台 | 仅供交流学习，请勿用于商业用途</p>
+                <p class="mt-2">如有侵权请联系删除 | 反馈邮箱：feedback@galgamecore.com</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    isMenuOpen: false,
+                    // 标签数据（实际从后端获取）
+                    tags: [
+                        {
+                            name: "纯爱",
+                            games: [
+                                { id: 1, title: "缘之空", imgUrl: "https://picsum.photos/id/240/400/300", type: "adult", platform: "KRKR" },
+                                { id: 5, title: "路人女主的养成方法", imgUrl: "https://picsum.photos/id/248/400/300", type: "allAge", platform: "安卓直装" },
+                                { id: 2, title: "Clannad", imgUrl: "https://picsum.photos/id/241/400/300", type: "allAge", platform: "KRKR" }
+                            ]
+                        },
+                        {
+                            name: "悬疑",
+                            games: [
+                                { id: 4, title: "Euphoria", imgUrl: "https://picsum.photos/id/243/400/300", type: "adult", platform: "KRKR" },
+                                { id: 9, title: "弹丸论破", imgUrl: "https://picsum.photos/id/252/400/300", type: "allAge", platform: "安卓直装" }
+                            ]
+                        },
+                        {
+                            name: "校园",
+                            games: [
+                                { id: 3, title: "白色相簿2", imgUrl: "https://picsum.photos/id/242/400/300", type: "allAge", platform: "KRKR" },
+                                { id: 7, title: "Love Plus", imgUrl: "https://picsum.photos/id/250/400/300", type: "allAge", platform: "安卓直装" }
+                            ]
+                        },
+                        {
+                            name: "奇幻",
+                            games: [
+                                { id: 6, title: "美少女万华镜", imgUrl: "https://picsum.photos/id/249/400/300", type: "adult", platform: "安卓直装" },
+                                { id: 10, title: "Fate/stay night", imgUrl: "https://picsum.photos/id/253/400/300", type: "allAge", platform: "KRKR" }
+                            ]
+                        },
+                        {
+                            name: "治愈",
+                            games: [
+                                { id: 2, title: "Clannad", imgUrl: "https://picsum.photos/id/241/400/300", type: "allAge", platform: "KRKR" },
+                                { id: 8, title: "Nekopara", imgUrl: "https://picsum.photos/id/251/400/300", type: "adult", platform: "安卓直装" }
+                            ]
+                        },
+                        {
+                            name: "恋爱模拟",
+                            games: [
+                                { id: 7, title: "Love Plus", imgUrl: "https://picsum.photos/id/250/400/300", type: "allAge", platform: "安卓直装" },
+                                { id: 5, title: "路人女主的养成方法", imgUrl: "https://picsum.photos/id/248/400/300", type: "allAge", platform: "安卓直装" }
+                            ]
+                        }
+                    ]
+                };
+            }
+        });
+        app.mount('#app');
+    </script>
+</body>
+</html>
