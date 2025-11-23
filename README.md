@@ -1,2 +1,2 @@
-# kitedd365.github.io
+# kitedd365.github.io/index.html
 公益性
